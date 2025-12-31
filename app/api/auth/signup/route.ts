@@ -13,10 +13,9 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    // Parse and validate with Zod
     const { email, password, role } = registerSchema.parse(body);
 
-    // Check for existing user
+  
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
@@ -25,10 +24,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Hash password
+  
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+   
     const newUser = new User({
       email,
       password: hashedPassword,
@@ -36,13 +35,13 @@ export async function POST(req: NextRequest) {
     });
     await newUser.save();
 
-    // Create token
+ 
     const token = createToken({
       userId: newUser._id.toString(),
       role: newUser.role,
     });
 
-    // Set cookie and respond
+
     const response = NextResponse.json({
       message: 'User created successfully',
     });
@@ -56,9 +55,11 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('Signup error:', error); // Log on server for debugging
+    console.error('Signup error:', error); 
 
     if (error instanceof ZodError) {
+
+      
       // Return detailed validation errors
       return NextResponse.json(
         {
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // For other errors (DB, bcrypt, etc.)
+   
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
